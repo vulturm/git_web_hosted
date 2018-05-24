@@ -1,4 +1,6 @@
 #!/bin/bash
+#-- make sure we have those installed
+sudo yum install -y xmlto asciidoc subversion-perl perl-YAML
 mkdir -p ~/rpmbuild ~/rpmbuild/BUILD ~/rpmbuild/BUILDROOT ~/rpmbuild/RPMS ~/rpmbuild/SOURCES ~/rpmbuild/SPECS ~/rpmbuild/SRPMS
 pushd ~/rpmbuild/SOURCES
 wget https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/git-core/git-1.9.0.tar.gz
