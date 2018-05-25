@@ -1,0 +1,36 @@
+#!/bin/env bash
+##
+CURRENT_REPO_PATH=$(pwd)
+PROJECT_NAME=$(basename "$CURRENT_REPO_PATH")
+ROOT_WORKSPACE="/home/git/gitea-workspace/"
+PROJECT_WORKSPACE="${ROOT_WORKSPACE}/${PROJECT_NAME}"
+COVERAGE_REPORT_FILE="coverage_report.log"
+#######
+#--
+_cleanup() {
+  rm -rf "${PROJECT_WORKSPACE}"
+}
+
+#-- prepare
+mkdir -p "$PROJECT_WORKSPACE"
+
+trap _cleanup EXIT
+
+#--
+while read -r _ newrev _
+do  
+    git archive "$newrev" | tar -x -C "${PROJECT_WORKSPACE}"
+
+    pushd "${PROJECT_WORKSPACE}"
+    [[ ! -x ./tests/run_all_units.sh ]] && continue;
+    
+    echo "Preparing to run tests for $newrev ..."
+    ./tests/run_all_units.sh
+    
+    if grep -q FAILURE "${COVERAGE_REPORT_FILE}"; then
+        echo "Failure while running tests on rev $newrev - push denied. Run tests locally and confirm they pass before pushing"
+        exit 1
+    fi
+done
+#-- OK
+exit 0
